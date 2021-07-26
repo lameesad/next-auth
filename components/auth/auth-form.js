@@ -52,7 +52,9 @@ function AuthForm() {
         const result = await createUser(enteredEmail, enteredPassword);
         console.log(result);
       } catch (error) {
-        console.log(error);
+        if (!result.error) {
+          // set some auth state
+        }
       }
     }
   }
