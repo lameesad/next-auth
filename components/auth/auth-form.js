@@ -1,30 +1,29 @@
 import { useState, useRef } from 'react';
-import classes from './auth-form.module.css';
+import { signIn } from 'next-auth/client';
 
+import classes from './auth-form.module.css';
 
 async function createUser(email, password) {
   const response = await fetch('/api/auth/signup', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
     headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+      'Content-Type': 'application/json',
+    },
+  });
 
-  const data = await response.json()
+  const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || 'Something went wrong')
+    throw new Error(data.message || 'Something went wrong!');
   }
 
-  return data
+  return data;
 }
 
-
-
 function AuthForm() {
-  const emailInputRef = useRef()
-  const passwordInputRef = useRef()
+  const emailInputRef = useRef();
+  const passwordInputRef = useRef();
 
   const [isLogin, setIsLogin] = useState(true);
 
@@ -41,7 +40,13 @@ function AuthForm() {
     // optional: Add validation
 
     if (isLogin) {
-      // log user in
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: enteredEmail,
+        password: enteredPassword,
+      });
+
+      console.log(result);
     } else {
       try {
         const result = await createUser(enteredEmail, enteredPassword);
@@ -51,7 +56,6 @@ function AuthForm() {
       }
     }
   }
-
 
   return (
     <section className={classes.auth}>
@@ -63,7 +67,12 @@ function AuthForm() {
         </div>
         <div className={classes.control}>
           <label htmlFor='password'>Your Password</label>
-          <input type='password' id='password' required ref={passwordInputRef} />
+          <input
+            type='password'
+            id='password'
+            required
+            ref={passwordInputRef}
+          />
         </div>
         <div className={classes.actions}>
           <button>{isLogin ? 'Login' : 'Create Account'}</button>
